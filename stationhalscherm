@@ -1,0 +1,74 @@
+import csv
+import psycopg2
+import datetime
+from tkinter import *
+import requests
+
+connection = psycopg2.connect(
+    host="localhost",
+    database="Project Stationszuil",
+    user="postgres",
+    password="2002")
+
+
+cursor = connection.cursor()
+
+
+cursor.execute("select * from bericht inner join moderator on moderator.moderatorid = bericht.moderatorid where moderator.beoordeling = 'Goedgekeurd' order  by beoordeling_datetime desc")
+
+# Fetch all rows
+rows = cursor.fetchall()
+
+results_list = []
+for row in rows:
+    results_list.append(row)
+
+root = Tk()
+root.geometry("700x600")
+root.title("Stationshal")
+root.iconbitmap("NS.ico")
+
+Bericht1 = Label(root, font=10, text=results_list[0][1])
+Bericht1.pack(padx=(70,0), pady=(40,0), anchor="w")
+
+Bericht2 = Label(root, font=10, text=results_list[1][1])
+Bericht2.pack(padx=(330,0),pady=(50,50), anchor="w")
+
+Bericht3 = Label(root, font=10, text=results_list[2][1])
+Bericht3.pack(padx=(60,0),pady=(20,30), anchor="w")
+
+Bericht4 = Label(root, font=10, text=results_list[3][1])
+Bericht4.pack(padx=(500,0), anchor="w")
+
+Bericht5 = Label(root, font=10, text=results_list[4][1])
+Bericht5.pack(padx=(10,0), anchor="w")
+
+
+######API######
+
+
+
+# Vervang 'Jouw-API-Sleutel' door de API-sleutel die je hebt gegenereerd
+api_key = 'df58fa177be8035f1cb794ad4ae86012'
+
+user_input = 'Amsterdam'
+
+weather_data = requests.get(
+    f"https://api.openweathermap.org/data/2.5/weather?q={user_input}&units=imperial&APPID={api_key}")
+
+weather = (weather_data.json())['weather'][0]['main']
+temp = round((weather_data.json()['main']['temp'] - 32) * (5 / 9))
+
+Weer1 = Label(root, font=10, text=f"The weather in {user_input} is: {weather}")
+Weer1.pack(anchor="w", side="bottom")
+
+Weer2 = Label(root, font=10, text=f"The temperature in {user_input} is: {temp}°C")
+Weer2.pack(anchor="w", side="bottom")
+
+
+
+
+root.mainloop()
+
+
+
